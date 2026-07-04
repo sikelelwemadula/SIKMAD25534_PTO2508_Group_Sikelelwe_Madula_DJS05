@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { PodcastProvider } from "./context/PodcastContext";
 import { fetchPodcasts } from "./api/fetchPodcasts";
 import { genres } from "./data";
@@ -9,12 +10,9 @@ import GenreFilter from "./components/GenreFilter";
 import PodcastGrid from "./components/PodcastGrid";
 import Pagination from "./components/Pagination";
 import styles from "./App.module.css";
+import ShowDetail from "./pages/ShowDetail";
 
-/**
- * Root component of the Podcast Explorer app.
- * Handles data fetching and layout composition.
- */
-export default function App() {
+function HomePage() {
   const [podcasts, setPodcasts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -62,3 +60,15 @@ export default function App() {
   );
 }
 
+export default function App() {
+  return (
+    <Router>
+      <div className="app-container">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/show/:id" element={<ShowDetail />} />
+        </Routes>
+      </div>
+    </Router>
+  );
+}

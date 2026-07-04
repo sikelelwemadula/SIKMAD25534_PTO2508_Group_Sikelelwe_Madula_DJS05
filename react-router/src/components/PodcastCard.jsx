@@ -1,4 +1,7 @@
+import { useContext } from "react";
+import { Link } from "react-router-dom";
 import { formatDate } from "../utils/formatDate";
+import { PodcastContext } from "../context/PodcastContext";
 import styles from "./PodcastCard.module.css";
 
 /**
@@ -17,6 +20,8 @@ import styles from "./PodcastCard.module.css";
  * @returns {JSX.Element} The rendered podcast card component.
  */
 export default function PodcastCard({ podcast, genres }) {
+  const { search } = useContext(PodcastContext);
+
   const genreSpans = podcast.genres.map((id) => {
     const match = genres.find((genre) => genre.id === id);
     return (
@@ -28,14 +33,19 @@ export default function PodcastCard({ podcast, genres }) {
 
   return (
     <div className={styles.card}>
-      <img src={podcast.image} alt={podcast.title} />
-
-      <h3>{podcast.title}</h3>
-      <p className={styles.seasons}>{podcast.seasons} seasons</p>
-      <div className={styles.tags}>{genreSpans}</div>
-      <p className={styles.updatedText}>
-        Updated {formatDate(podcast.updated)}
-      </p>
+      <Link
+        to={`/show/${podcast.id}`}
+        state={{ searchTerm: search }}
+        className={styles.cardLink}
+      >
+        <img src={podcast.image} alt={podcast.title} />
+        <h3>{podcast.title}</h3>
+        <p className={styles.seasons}>{podcast.seasons} seasons</p>
+        <div className={styles.tags}>{genreSpans}</div>
+        <p className={styles.updatedText}>
+          Updated {formatDate(podcast.updated)}
+        </p>
+      </Link>
     </div>
   );
 }

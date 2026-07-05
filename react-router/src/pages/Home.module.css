@@ -65,10 +65,17 @@
   margin-bottom: 1.5rem;
 }
 
+.metaSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
 .metaText {
   font-size: 0.9rem;
   color: #64748b;
-  margin-bottom: 1rem;
+  margin: 0;
 }
 
 /* Genre tags cluster */

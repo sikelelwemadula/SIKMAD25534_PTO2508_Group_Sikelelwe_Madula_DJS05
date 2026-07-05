@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
+import { genres } from '../data';
 import styles from "./Home.module.css";
 
-const GENRES = {
-  1: "Personal Growth",
-  2: "Investigative Journalism",
-  3: "History",
-  4: "Comedy",
-  5: "Entertainment",
-  6: "Business",
-  7: "Fiction",
-  8: "News",
-  9: "Kids and Family"
-};
+function getGenreLabel(genreValue) {
+  if (genreValue === null || genreValue === undefined || genreValue === "") {
+    return "Unknown Genre";
+  }
+
+  const rawValue = String(genreValue).trim();
+  const normalizedValue = rawValue.toLowerCase();
+
+  const match = genres.find((item) => {
+    const itemTitle = item.title?.toLowerCase() || "";
+    return (
+      item.id === Number(genreValue) ||
+      itemTitle === normalizedValue ||
+      itemTitle.includes(normalizedValue) ||
+      normalizedValue.includes(itemTitle)
+    );
+  });
+
+  return match?.title || rawValue;
+}
 
 function ShowDetail() {
   const { id } = useParams();
@@ -59,10 +69,18 @@ function ShowDetail() {
         <div className={styles.headerInfo}>
           <h1>{show.title}</h1>
           <p className={styles.description}>{show.description}</p>
-          <p className={styles.metaText}><strong>Last Updated:</strong> {new Date(show.updated).toLocaleDateString()}</p>
+
+          <div className={styles.metaSummary}>
+            <p className={styles.metaText}><strong>Last Updated:</strong> {new Date(show.updated).toLocaleDateString()}</p>
+            <p className={styles.metaText}><strong>Total Seasons:</strong> {show.seasons?.length || 0}</p>
+            <p className={styles.metaText}><strong>Total Episodes:</strong> {(show.seasons || []).reduce((total, season) => total + (season.episodes?.length || 0), 0)}</p>
+          </div>
+
           <div className={styles.genres}>
-            {show.genres?.map(genreId => (
-              <span key={genreId} className={styles.genreTag}>{GENRES[genreId]}</span>
+            {(show.genres || []).map((genreValue, index) => (
+              <span key={`${genreValue}-${index}`} className={styles.genreTag}>
+                {getGenreLabel(genreValue)}
+              </span>
             ))}
           </div>
         </div>

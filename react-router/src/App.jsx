@@ -12,7 +12,45 @@ import Pagination from "./components/Pagination";
 import styles from "./App.module.css";
 import ShowDetail from "./pages/ShowDetail";
 
-function HomePage() {
+function HomePage({ loading, error }) {
+  return (
+    <>
+      <Header />
+
+      <main className={styles.main}>
+        <section className={styles.controls}>
+          <SearchBar />
+          <GenreFilter genres={genres} />
+          <SortSelect />
+        </section>
+
+        {loading && (
+          <div className={styles.messageContainer}>
+            <div className={styles.spinner}></div>
+            <p>Loading podcasts...</p>
+          </div>
+        )}
+
+        {error && (
+          <div className={styles.message}>
+            <div className={styles.error}>
+              Error occurred while fetching podcasts: {error}
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <>
+            <PodcastGrid genres={genres} />
+            <Pagination />
+          </>
+        )}
+      </main>
+    </>
+  );
+}
+
+export default function App() {
   const [podcasts, setPodcasts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,52 +60,14 @@ function HomePage() {
   }, []);
 
   return (
-    <>
-      <Header />
-
-      <PodcastProvider initialPodcasts={podcasts}>
-        <main className={styles.main}>
-          <section className={styles.controls}>
-            <SearchBar />
-            <GenreFilter genres={genres} />
-            <SortSelect />
-          </section>
-
-          {loading && (
-            <div className={styles.messageContainer}>
-              <div className={styles.spinner}></div>
-              <p>Loading podcasts...</p>
-            </div>
-          )}
-
-          {error && (
-            <div className={styles.message}>
-              <div className={styles.error}>
-                Error occurred while fetching podcasts: {error}
-              </div>
-            </div>
-          )}
-
-          {!loading && !error && (
-            <>
-              <PodcastGrid genres={genres} />
-              <Pagination />
-            </>
-          )}
-        </main>
-      </PodcastProvider>
-    </>
-  );
-}
-
-export default function App() {
-  return (
     <Router>
       <div className="app-container">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/show/:id" element={<ShowDetail />} />
-        </Routes>
+        <PodcastProvider initialPodcasts={podcasts}>
+          <Routes>
+            <Route path="/" element={<HomePage loading={loading} error={error} />} />
+            <Route path="/show/:id" element={<ShowDetail />} />
+          </Routes>
+        </PodcastProvider>
       </div>
     </Router>
   );

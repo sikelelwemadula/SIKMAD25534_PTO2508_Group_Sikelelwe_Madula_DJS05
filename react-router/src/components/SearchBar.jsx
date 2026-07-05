@@ -3,17 +3,33 @@ import { PodcastContext } from "../context/PodcastContext";
 import styles from "./SearchBar.module.css";
 
 /**
- * Search input with debounced update.
+ * An interactive text input component that filters podcasts by a search query.
+ * Syncs with global `PodcastContext` state using a local debounce mechanism
+ * to limit API/state updates while typing.
+ *
+ * @component
+ * @returns {JSX.Element} A styled HTML search input element.
  */
 export default function SearchBar() {
+  /**
+   * Global search query and state setter from the context.
+   */
   const { search, setSearch } = useContext(PodcastContext);
+
+  /**
+   * Local immediate state of the text input field.
+   * @type {[string, React.Dispatch<React.SetStateAction<string>>]}
+   */
   const [value, setValue] = useState(search);
 
-  // Debounce input (300ms) to avoid rapid updates.
+  /**
+   * Debounces the local `value` changes by 300ms before committing the 
+   * final query value to the global `PodcastContext` state.
+   */
   useEffect(() => {
     const id = setTimeout(() => setSearch(value), 300);
     return () => clearTimeout(id);
-  }, [value]);
+  }, [value, setSearch]);
 
   return (
     <input

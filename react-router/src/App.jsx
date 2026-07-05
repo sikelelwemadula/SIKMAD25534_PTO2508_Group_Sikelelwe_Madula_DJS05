@@ -12,6 +12,21 @@ import Pagination from "./components/Pagination";
 import styles from "./App.module.css";
 import ShowDetail from "./pages/ShowDetail";
 
+/**
+ * Properties for the HomePage layout component.
+ * @typedef {Object} HomePageProps
+ * @property {boolean} loading - Network flag indicating if global podcast data is fetching.
+ * @property {string|null} error - Contains the raw error message string if a fetch request fails.
+ */
+
+/**
+ * Presentation component wrapper that renders the primary control bar and data layouts.
+ * Integrates search parameters, genre options, and grid lists into a semantic layout.
+ *
+ * @component
+ * @param {HomePageProps} props - The structural loading and error state properties.
+ * @returns {JSX.Element} The aggregated home view elements or placeholder message wrappers.
+ */
 function HomePage({ loading, error }) {
   return (
     <>
@@ -50,11 +65,36 @@ function HomePage({ loading, error }) {
   );
 }
 
+/**
+ * Root application component responsible for critical configuration wrappers.
+ * Sets up global routing engines, mounts the context provider state tree,
+ * and handles top-level data initialization requests upon mounting.
+ *
+ * @component
+ * @returns {JSX.Element} The absolute base React Router tree structure.
+ */
 export default function App() {
+  /**
+   * Complete unfiltered dictionary array containing podcasts fetched from the API.
+   * @type {[Array, React.Dispatch<React.SetStateAction<Array>>]}
+   */
   const [podcasts, setPodcasts] = useState([]);
+
+  /**
+   * Pending network request status flag.
+   * @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]}
+   */
   const [loading, setLoading] = useState(true);
+
+  /**
+   * Captured message string reflecting request errors.
+   * @type {[string|null, React.Dispatch<React.SetStateAction<string|null>>]}
+   */
   const [error, setError] = useState(null);
 
+  /**
+   * Triggers the asynchronous payload dispatch wrapper configuration on assembly mount.
+   */
   useEffect(() => {
     fetchPodcasts(setPodcasts, setError, setLoading);
   }, []);

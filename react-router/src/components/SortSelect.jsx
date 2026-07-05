@@ -3,7 +3,19 @@ import { SORT_OPTIONS, PodcastContext } from "../context/PodcastContext";
 import styles from "./SortSelect.module.css";
 
 /**
- * Dropdown for choosing sort order.
+ * Sort options object structure.
+ * @typedef {Object} SortOption
+ * @property {string} key - The backend or state value used to sort data.
+ * @property {string} label - The human-readable display string for the dropdown option.
+ */
+
+/**
+ * A dropdown select component for changing the display order of podcasts.
+ * Interacts with `PodcastContext` to update global sorting states and renders options
+ * derived dynamically from the global `SORT_OPTIONS` configuration.
+ *
+ * @component
+ * @returns {JSX.Element} A styled HTML select element for sorting.
  */
 export default function SortSelect() {
   const { sortKey, setSortKey } = useContext(PodcastContext);

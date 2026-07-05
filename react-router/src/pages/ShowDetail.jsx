@@ -3,6 +3,44 @@ import { useParams, Link, useLocation } from 'react-router-dom';
 import { genres } from '../data';
 import styles from "./Home.module.css";
 
+/**
+ * Episode object structure.
+ * @typedef {Object} Episode
+ * @property {string|number} id - Unique identifier for the episode.
+ * @property {number} episode - The sequential number of the episode in its season.
+ * @property {string} title - The title of the episode.
+ * @property {string} description - Brief summary of the episode content.
+ * @property {string} [file] - Absolute URL path to the streamable audio file.
+ */
+
+/**
+ * Season object structure.
+ * @typedef {Object} Season
+ * @property {number|string} [season] - Sequential identifier of the season.
+ * @property {string} title - Display title of the season.
+ * @property {string} [image] - Thumbnail image URL specific to this season.
+ * @property {Episode[]} episodes - Collection of episodes belonging to this season.
+ */
+
+/**
+ * Detailed information payload for an individual podcast show.
+ * @typedef {Object} DetailedShowData
+ * @property {string} id - Unique identifier for the podcast show.
+ * @property {string} title - The main name of the show.
+ * @property {string} description - Comprehensive summary description.
+ * @property {string} image - Absolute URL path to the main show artwork banner.
+ * @property {string|number} updated - Timestamp or ISO date string of the last update.
+ * @property {Season[]} seasons - Array of seasons structured inside the show.
+ * @property {(string|number)[]} genres - Raw genre lookup flags or names.
+ */
+
+/**
+ * Normalises a genre input identifier or fragment to find its human-readable title.
+ * Scans static dataset reference keys for robust soft text alignment matching.
+ *
+ * @param {string|number|null|undefined} genreValue - Raw value representing a target genre.
+ * @returns {string} The identified human-readable title, or the fallback raw value string.
+ */
 function getGenreLabel(genreValue) {
   if (genreValue === null || genreValue === undefined || genreValue === "") {
     return "Unknown Genre";
@@ -24,17 +62,60 @@ function getGenreLabel(genreValue) {
   return match?.title || rawValue;
 }
 
+/**
+ * Main detail wrapper page layout displaying deep metadata, seasons, and episodes.
+ * Requests data over the network via specific url query route ID arguments.
+ * Rescues navigation state tracking so search indices remain unbroken when returning home.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered full profile layout view or state condition notices.
+ */
 function ShowDetail() {
+  /**
+   * Extracted string map containing parameters parsed from the active browser address query route.
+   * @type {Object.<string, string>}
+   */
   const { id } = useParams();
+
+  /**
+   * Router location history state track reference tool.
+   * @type {import('react-router-dom').Location}
+   */
   const location = useLocation();
   
+  /**
+   * Active unpacked details response structure hook.
+   * @type {[DetailedShowData|null, React.Dispatch<React.SetStateAction<DetailedShowData|null>>]}
+   */
   const [show, setShow] = useState(null);
+
+  /**
+   * Index position identifier tracking which season dataset is currently active.
+   * @type {[number, React.Dispatch<React.SetStateAction<number>>]}
+   */
   const [selectedSeason, setSelectedSeason] = useState(0);
+
+  /**
+   * Active background process network loading state flag toggler.
+   * @type {[boolean, React.Dispatch<React.SetStateAction<boolean>>]}
+   */
   const [loading, setLoading] = useState(true);
+
+  /**
+   * Active error capture message container block.
+   * @type {[string|null, React.Dispatch<React.SetStateAction<string|null>>]}
+   */
   const [error, setError] = useState(null);
 
+  /**
+   * Rescued query term cache key parameter payload extracted from route tracking.
+   * @type {string}
+   */
   const previousSearchTerm = location.state?.searchTerm || '';
 
+  /**
+   * Dispatches automated profile lookup triggers targeting independent remote show identification keys.
+   */
   useEffect(() => {
     setLoading(true);
     fetch(`https://podcast-api.netlify.app/id/${id}`)
@@ -56,6 +137,10 @@ function ShowDetail() {
   if (error) return <div className={styles.centerText}>Error: {error}</div>;
   if (!show) return <div className={styles.centerText}>Show not found.</div>;
 
+  /**
+   * Derived season structure profile matching the active selected layout state index.
+   * @type {Season|undefined}
+   */
   const currentSeason = show.seasons?.[selectedSeason];
 
   return (
